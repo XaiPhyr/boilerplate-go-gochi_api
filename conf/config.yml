@@ -1,5 +1,0 @@
-server:
-  endpoint: '/api'
-  jwt_key: 'gochi_api'
-
-database:
