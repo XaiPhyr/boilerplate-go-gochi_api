@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -68,21 +67,15 @@ func RefreshJWT() {
 	//
 }
 
-func HashPassword(password string) error {
+func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 
 	if err != nil {
 		log.Printf("Error: %s", err)
-		return err
+		return "", err
 	}
 
-	fmt.Println()
-	fmt.Println()
-	fmt.Println(string(bytes))
-	fmt.Println()
-	fmt.Println()
-
-	return nil
+	return string(bytes), nil
 }
 
 func CheckPassword() error {

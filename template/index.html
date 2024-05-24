@@ -23,14 +23,12 @@
       });
 
       const params = {
-        method: 'GET',
-        headers: {
-          'Content-type': 'application/json; charset=utf-8',
-          Authentication: body,
-        },
+        method: 'POST',
+        headers: { 'Content-type': 'application/json; charset=utf-8' },
+        body,
       };
 
-      const res = await fetch('/api/login', params);
+      const res = await fetch('/api/register', params);
       const json = await res.json();
       console.log(json);
     }

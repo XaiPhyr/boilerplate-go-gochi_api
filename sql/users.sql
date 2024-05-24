@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
-  id bigserial primary key not null,
+  id bigserial not null,
   username varchar(45) default null,
   password varchar(255) default null,
   email varchar(45) default null,
@@ -7,8 +7,9 @@ CREATE TABLE IF NOT EXISTS users (
   status varchar(1) default 'O',
   active boolean default null,
   created_at timestamptz default now(),
-  modified_at timestamptz default now(),
+  updated_at timestamptz default now(),
   deleted_at timestamptz null,
+  CONSTRAINT users_pkey PRIMARY KEY (id),
   CONSTRAINT username_alphanumeric_check CHECK (username ~ '^[a-zA-Z0-9]*$')
 );
 

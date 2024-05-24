@@ -20,6 +20,10 @@ func (a Authentication) InitAuthentication(m models.MuxServer) {
 	m.Mux.Route(m.Endpoint+"/login", func(r chi.Router) {
 		r.Get("/", a.Login)
 	})
+
+	m.Mux.Route(m.Endpoint+"/register", func(r chi.Router) {
+		r.Post("/", a.Register)
+	})
 }
 
 func (a Authentication) Login(w http.ResponseWriter, r *http.Request) {
@@ -51,5 +55,30 @@ func (a Authentication) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a Authentication) Register(w http.ResponseWriter, r *http.Request) {
+	// user := models.NewRegister()
 
+	// if err != nil {
+	// 	log.Printf("Error: %s", err)
+	// 	return
+	// }
+
+	// if err = json.NewDecoder(r.Body).Decode(&user); err == nil {
+	// 	hashPassword, _ := s.HashPassword(user.Password)
+	// 	user.Password = hashPassword
+
+	// 	result := db.Create(&user)
+
+	// 	err = result.Error
+
+	// 	if err != nil {
+	// 		fmt.Println()
+	// 		fmt.Println(errors.Is(err, gorm.ErrCheckConstraintViolated))
+	// 		fmt.Println()
+	// 		log.Printf("%s", err)
+
+	// 		return
+	// 	}
+
+	// 	a.toJson(w, user)
+	// }
 }
