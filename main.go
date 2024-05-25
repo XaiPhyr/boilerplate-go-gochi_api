@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"gochi_api/routers"
+	"log"
 	"net/http"
 )
 
@@ -12,6 +12,6 @@ func main() {
 	splash := http.FileServer(http.Dir("./template"))
 	r.Handle("/", http.StripPrefix("/", splash))
 
-	fmt.Println("api listening : http://localhost:8200")
+	log.Printf("-> Local:   http://localhost:8200")
 	http.ListenAndServe(":8200", r)
 }

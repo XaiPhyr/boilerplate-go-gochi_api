@@ -1,22 +1,17 @@
 package models
 
 import (
+	"context"
+	"database/sql"
+	"log"
+
 	"github.com/go-chi/chi"
 	"github.com/golang-jwt/jwt"
+
+	u "gochi_api/utils"
 )
 
 type (
-	Config struct {
-		Server ServerConfig `yaml:"server"`
-	}
-
-	ServerConfig struct {
-		Endpoint string `yaml:"endpoint"`
-		JwtKey   string `yaml:"jwt_key"`
-	}
-
-	DatabaseConfig struct{}
-
 	MuxServer struct {
 		Mux      *chi.Mux
 		Endpoint string
@@ -26,4 +21,24 @@ type (
 		Username string `json:"username"`
 		jwt.StandardClaims
 	}
+
+	ErrorObject struct {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+	}
 )
+
+func Create(data interface{}) (result sql.Result, err error) {
+	ctx := context.Background()
+
+	db := u.InitDBConnect()
+	q := db.NewInsert().Model(data)
+
+	result, err = q.Exec(ctx)
+
+	if err != nil {
+		log.Printf("App Model \"Create\" %s", err)
+	}
+
+	return result, err
+}

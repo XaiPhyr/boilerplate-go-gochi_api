@@ -9,14 +9,17 @@
   <script>
     async function onSubmit() {
       const { fetch } = window;
+      const docEmail = document.querySelector('#id_email');
       const docUsername = document.querySelector('#id_username');
       const docPassword = document.querySelector('#id_password');
       const docRememberMe = document.querySelector('#id_remember_me');
+      const { value: email } = docEmail;
       const { value: username } = docUsername;
       const { value: password } = docPassword;
       const { checked: remember_me } = docRememberMe;
 
       body = JSON.stringify({
+        email,
         username,
         password,
         remember_me,
@@ -35,6 +38,7 @@
   </script>
   <body>
     <form action="">
+      <input type="text" name="name_email" id="id_email" autocomplete="email" />
       <input
         type="text"
         name="name_username"

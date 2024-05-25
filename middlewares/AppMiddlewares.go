@@ -26,7 +26,6 @@ var (
 
 func Authenticate(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		auth := r.Header.Get("Authorization")
 		t := strings.Split(auth, " ")[1]
 		s.VerifyJWT(t, w)

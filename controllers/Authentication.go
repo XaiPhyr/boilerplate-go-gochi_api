@@ -51,34 +51,25 @@ func (a Authentication) Login(w http.ResponseWriter, r *http.Request) {
 	info.Token = token
 	info.Username = l.Username
 	info.RememberMe = l.RememberMe
+
 	a.toJson(w, info)
 }
 
 func (a Authentication) Register(w http.ResponseWriter, r *http.Request) {
-	// user := models.NewRegister()
+	user := a.userModel.NewRegister()
 
-	// if err != nil {
-	// 	log.Printf("Error: %s", err)
-	// 	return
-	// }
+	if err := json.NewDecoder(r.Body).Decode(&user); err == nil {
+		hashPassword, _ := s.HashPassword(user.Password)
+		user.Password = hashPassword
 
-	// if err = json.NewDecoder(r.Body).Decode(&user); err == nil {
-	// 	hashPassword, _ := s.HashPassword(user.Password)
-	// 	user.Password = hashPassword
+		err := a.userModel.CreateUser(user)
 
-	// 	result := db.Create(&user)
+		if err != nil {
+			errObj := a.userModel.HandleAuthenticationError(err)
+			a.handleError(w, errObj)
+			return
+		}
 
-	// 	err = result.Error
-
-	// 	if err != nil {
-	// 		fmt.Println()
-	// 		fmt.Println(errors.Is(err, gorm.ErrCheckConstraintViolated))
-	// 		fmt.Println()
-	// 		log.Printf("%s", err)
-
-	// 		return
-	// 	}
-
-	// 	a.toJson(w, user)
-	// }
+		a.toJson(w, user)
+	}
 }
