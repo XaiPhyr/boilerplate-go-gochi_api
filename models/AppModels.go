@@ -2,11 +2,9 @@ package models
 
 import (
 	"context"
-	"database/sql"
-	"log"
 
 	"github.com/go-chi/chi"
-	"github.com/golang-jwt/jwt"
+	"github.com/uptrace/bun"
 
 	u "gochi_api/utils"
 )
@@ -17,28 +15,40 @@ type (
 		Endpoint string
 	}
 
-	JwtClaim struct {
-		Username string `json:"username"`
-		jwt.StandardClaims
-	}
-
 	ErrorObject struct {
 		Code    int    `json:"code"`
 		Message string `json:"message"`
 	}
 )
 
-func Create(data interface{}) (result sql.Result, err error) {
-	ctx := context.Background()
+func Create(model interface{}) (q *bun.InsertQuery, ctx context.Context) {
+	ctx = context.Background()
 
 	db := u.InitDBConnect()
-	q := db.NewInsert().Model(data)
+	q = db.NewInsert().Model(model)
+	return
+}
 
-	result, err = q.Exec(ctx)
+func Read(model interface{}) (q *bun.SelectQuery, ctx context.Context) {
+	ctx = context.Background()
 
-	if err != nil {
-		log.Printf("App Model \"Create\" %s", err)
-	}
+	db := u.InitDBConnect()
+	q = db.NewSelect().Model(model)
+	return
+}
 
-	return result, err
+func Update(model interface{}) (q *bun.UpdateQuery, ctx context.Context) {
+	ctx = context.Background()
+
+	db := u.InitDBConnect()
+	q = db.NewUpdate().Model(model)
+	return
+}
+
+func Delete(model interface{}) (q *bun.DeleteQuery, ctx context.Context) {
+	ctx = context.Background()
+
+	db := u.InitDBConnect()
+	q = db.NewDelete().Model(model)
+	return
 }

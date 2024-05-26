@@ -13,12 +13,16 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"gopkg.in/yaml.v3"
+
+	"github.com/uptrace/bun/extra/bundebug"
 )
 
 type (
 	Config struct {
 		Server   ServerConfig   `yaml:"server"`
 		Database DatabaseConfig `yaml:"database"`
+		Frontend FrontendConfig `yaml:"frontend"`
+		Env      string         `yaml:"env"`
 	}
 
 	ServerConfig struct {
@@ -33,6 +37,10 @@ type (
 		Port    string `yaml:"port"`
 		DB      string `yaml:"db"`
 		SSLMode string `yaml:"sslmode"`
+	}
+
+	FrontendConfig struct {
+		Source string `yaml:"src"`
 	}
 )
 
@@ -86,6 +94,10 @@ func InitDBConnect() *bun.DB {
 	dsn := "postgres://" + username + ":" + password + "@" + host + ":" + port + "/" + database + "?sslmode=" + sslmode
 	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
 	db := bun.NewDB(sqldb, pgdialect.New())
+
+	if cfg.Env == "dev" {
+		db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+	}
 
 	return db
 }

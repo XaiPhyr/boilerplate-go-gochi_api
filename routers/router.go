@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	hw   = &c.HelloWorld{}
 	auth = &c.Authentication{}
+	user = &c.Users{}
 )
 
 func NewRoutes() chi.Router {
@@ -30,8 +30,8 @@ func NewRoutes() chi.Router {
 	}
 
 	// @routes
-	hw.InitHelloWorld(mux)
 	auth.InitAuthentication(mux)
+	user.InitUsers(mux)
 
 	// @status 404, 405
 	PageNotFound(r)

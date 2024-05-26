@@ -29,6 +29,7 @@ func (a Authentication) InitAuthentication(m models.MuxServer) {
 func (a Authentication) Login(w http.ResponseWriter, r *http.Request) {
 	var info models.Authentication
 	var l models.Login
+	var user *models.Users
 
 	token, err := s.GenerateJWT()
 
@@ -41,10 +42,20 @@ func (a Authentication) Login(w http.ResponseWriter, r *http.Request) {
 	readAuth := strings.NewReader(auth)
 	err = json.NewDecoder(readAuth).Decode(&l)
 
-	s.HashPassword(l.Password)
-
 	if err != nil {
 		log.Printf("Error: %s", err)
+		return
+	}
+
+	user, err = a.userModel.ReadByUsername(l.Username)
+
+	if err != nil {
+		a.handleError(w, http.StatusNotFound, "User not found")
+		return
+	}
+
+	if err = s.CheckPassword(user.Password, l.Password); err != nil {
+		a.handleError(w, http.StatusUnauthorized, "Password Incorrect")
 		return
 	}
 
@@ -62,11 +73,7 @@ func (a Authentication) Register(w http.ResponseWriter, r *http.Request) {
 		hashPassword, _ := s.HashPassword(user.Password)
 		user.Password = hashPassword
 
-		err := a.userModel.CreateUser(user)
-
-		if err != nil {
-			errObj := a.userModel.HandleAuthenticationError(err)
-			a.handleError(w, errObj)
+		if _, err := a.userModel.CreateUser(w, user, a.handleError); err != nil {
 			return
 		}
 

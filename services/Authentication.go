@@ -5,12 +5,16 @@ import (
 	"net/http"
 	"time"
 
-	"gochi_api/models"
 	u "gochi_api/utils"
 
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
+
+type JwtClaim struct {
+	Username string `json:"username"`
+	jwt.StandardClaims
+}
 
 const (
 	JwtExpiration        = 5 * time.Minute
@@ -39,7 +43,7 @@ func GenerateJWT() (string, error) {
 	return tokenString, nil
 }
 
-func VerifyJWT(token string, w http.ResponseWriter) {
+func VerifyJWT(token string, w http.ResponseWriter) (err error) {
 	app := u.InitConfig()
 	jwtKey := app.Server.JwtKey
 
@@ -47,9 +51,9 @@ func VerifyJWT(token string, w http.ResponseWriter) {
 		return []byte(jwtKey), nil
 	}
 
-	t, err := jwt.ParseWithClaims(token, &models.JwtClaim{}, keyFunc)
+	t, err := jwt.ParseWithClaims(token, &JwtClaim{}, keyFunc)
 
-	claims, _ := t.Claims.(*models.JwtClaim)
+	claims, _ := t.Claims.(*JwtClaim)
 
 	if claims.ExpiresAt < time.Now().Local().Unix() {
 		log.Printf("Error: %s", err)
@@ -61,6 +65,8 @@ func VerifyJWT(token string, w http.ResponseWriter) {
 		log.Printf("Error: %s", err)
 		return
 	}
+
+	return
 }
 
 func RefreshJWT() {
@@ -78,8 +84,8 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), nil
 }
 
-func CheckPassword() error {
-	err := bcrypt.CompareHashAndPassword([]byte(""), []byte(""))
+func CheckPassword(hashedPassword, password string) error {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 
 	if err != nil {
 		log.Printf("Error: %s", err)
@@ -89,8 +95,8 @@ func CheckPassword() error {
 	return nil
 }
 
-func registerToken(duration time.Duration) (claims *models.JwtClaim) {
-	claims = &models.JwtClaim{
+func registerToken(duration time.Duration) (claims *JwtClaim) {
+	claims = &JwtClaim{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(duration).Unix(),
 		},

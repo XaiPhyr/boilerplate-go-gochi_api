@@ -1,10 +1,12 @@
 package middlewares
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 	"time"
 
+	"gochi_api/models"
 	s "gochi_api/services"
 
 	"github.com/go-chi/chi"
@@ -24,11 +26,37 @@ var (
 	HttpRate          = httprate.LimitByIP(100, LimiterExpiration)
 )
 
-func Authenticate(h http.Handler) http.Handler {
+func (m Middleware) Authenticate(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
+
+		if auth == "" {
+			errObj := &models.ErrorObject{
+				Code:    http.StatusUnauthorized,
+				Message: "Unauthorized",
+			}
+
+			jsonMarshal, _ := json.MarshalIndent(errObj, "", "  ")
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(jsonMarshal))
+
+			return
+		}
+
 		t := strings.Split(auth, " ")[1]
-		s.VerifyJWT(t, w)
+
+		if err := s.VerifyJWT(t, w); err != nil {
+			errObj := &models.ErrorObject{
+				Code:    http.StatusUnauthorized,
+				Message: "Token Expired",
+			}
+
+			jsonMarshal, _ := json.MarshalIndent(errObj, "", "  ")
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(jsonMarshal))
+
+			return
+		}
 
 		h.ServeHTTP(w, r)
 	})
