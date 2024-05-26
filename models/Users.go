@@ -12,6 +12,11 @@ import (
 )
 
 type (
+	UserResults struct {
+		Count int      `json:"count"`
+		Data  *[]Users `json:"data"`
+	}
+
 	Users struct {
 		bun.BaseModel `bun:"table:users,alias:u"`
 
@@ -37,7 +42,16 @@ func (u *Users) NewRegister() *Users {
 	}
 }
 
-func (u *Users) ReadAllUsers(data *Users) (err error) {
+func (u *Users) ReadAllUsers(limit, offset int) (data *[]Users, count int, err error) {
+	data = new([]Users)
+
+	q, ctx := Read(data)
+	q = q.ExcludeColumn("password")
+	q = q.Limit(limit)
+	q = q.Offset(offset)
+	q = q.Order("created_at DESC")
+
+	count, err = q.ScanAndCount(ctx)
 	return
 }
 

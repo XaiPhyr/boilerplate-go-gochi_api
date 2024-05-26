@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	c "gochi_api/controllers"
@@ -19,6 +20,8 @@ var (
 )
 
 func InitAuthenticationTest(req *http.Request) *httptest.ResponseRecorder {
+	os.Setenv("APP_ENVIRONMENT", "test")
+
 	a := &c.Authentication{}
 	r := chi.NewRouter()
 
@@ -38,8 +41,8 @@ func InitAuthenticationTest(req *http.Request) *httptest.ResponseRecorder {
 
 func TestAuthenticationLogin(t *testing.T) {
 	jsonBody := map[string]interface{}{
-		"username": "user",
-		"password": "password",
+		"username": "rdev2",
+		"password": "iamuser01",
 	}
 
 	b, _ := json.Marshal(jsonBody)
@@ -52,7 +55,7 @@ func TestAuthenticationLogin(t *testing.T) {
 }
 
 func TestPageNotFound(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/error-page", nil)
+	req, _ := http.NewRequest("GET", "/404", nil)
 	rr := InitAuthenticationTest(req)
 
 	require.Equal(t, 404, rr.Code)

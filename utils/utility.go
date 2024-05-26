@@ -47,7 +47,15 @@ type (
 func InitConfig() Config {
 	var cfg Config
 
-	f, err := os.Open("./conf/config.yml")
+	env := os.Getenv("APP_ENVIRONMENT")
+
+	rootFile := "./conf/config.yml"
+
+	if env == "test" {
+		rootFile = "../conf/config.yml"
+	}
+
+	f, err := os.Open(rootFile)
 	if err != nil {
 		log.Printf("Error: %s", err)
 	}

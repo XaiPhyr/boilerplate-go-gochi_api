@@ -17,7 +17,7 @@ type JwtClaim struct {
 }
 
 const (
-	JwtExpiration        = 5 * time.Minute
+	JwtExpiration        = 15 * time.Minute
 	LimiterExpiration    = 1 * time.Minute
 	JwtRefreshExpiration = 1 * time.Hour
 )
