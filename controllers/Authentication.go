@@ -12,6 +12,7 @@ import (
 	utils "gochi_api/utils"
 
 	"github.com/go-chi/chi"
+	"github.com/gorilla/websocket"
 )
 
 type Authentication struct {
@@ -94,5 +95,34 @@ func (a Authentication) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a Authentication) Notify(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("NOTIFIED"))
+	upgrader := websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
+
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Printf("Error: %s", err)
+	}
+
+	a.reader(ws)
+}
+
+func (a Authentication) reader(conn *websocket.Conn) {
+	for {
+		mt, p, err := conn.ReadMessage()
+		if err != nil {
+			log.Printf("Error: %s", err)
+			return
+		}
+
+		log.Printf("Websocket: %s", string(p))
+
+		if err := conn.WriteMessage(mt, p); err != nil {
+			log.Printf("Error: %s", err)
+			return
+		}
+	}
 }
