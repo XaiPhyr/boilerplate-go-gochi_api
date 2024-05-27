@@ -16,10 +16,14 @@ func main() {
 	cfg := utils.InitConfig()
 
 	rootFile := cfg.Frontend.Source
-	fs := http.FileServer(http.Dir(rootFile))
-	r.Handle("/", http.StripPrefix("/", fs))
+	_, err := os.Stat(rootFile + "/index.html")
 
-	FileServer(r, fs, rootFile)
+	if !os.IsNotExist(err) {
+		fs := http.FileServer(http.Dir(rootFile))
+		r.Handle("/", http.StripPrefix("/", fs))
+
+		FileServer(r, fs, rootFile)
+	}
 
 	fmt.Println()
 	log.Printf("-> Local:   http://localhost:8200")
