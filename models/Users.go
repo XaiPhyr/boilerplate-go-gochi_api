@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"reflect"
 	"time"
 
 	"github.com/google/uuid"
@@ -58,8 +59,10 @@ func (u *Users) ReadAllUsers(limit, offset int) (data *[]Users, count int, err e
 func (u *Users) ReadOneUser(uuid string) (data *Users, err error) {
 	data = new(Users)
 
+	excludeCols := []string{"password"}
+
 	q, ctx := Read(data)
-	q = q.ExcludeColumn("password")
+	q = q.ExcludeColumn(excludeCols...)
 	q = q.Where("uuid = ?", uuid)
 
 	err = q.Scan(ctx)
@@ -79,7 +82,20 @@ func (u *Users) CreateUser(w http.ResponseWriter, data *Users, fn func(w http.Re
 	return result, nil
 }
 
-func (u *Users) UpdateOneUser(data *Users) (err error) {
+func (u *Users) UpdateUser(w http.ResponseWriter, data *Users, fn func(w http.ResponseWriter, code int, message string)) (result sql.Result, err error) {
+	excludeCols := []string{"password", "created_at"}
+
+	q, ctx := Update(data)
+	q = q.ExcludeColumn(excludeCols...)
+	q = q.WherePK()
+
+	result, err = q.Exec(ctx)
+
+	if err != nil {
+		u.HandleUserError(w, err, fn)
+		return nil, err
+	}
+
 	return
 }
 
@@ -107,30 +123,34 @@ func (u *Users) ReadByUsername(user string) (data *Users, err error) {
 }
 
 func (u *Users) HandleUserError(w http.ResponseWriter, err error, fn func(w http.ResponseWriter, code int, message string)) {
-	log.Printf("Error: %s", err)
+	log.Printf("Handle User Error: %s", err)
 
 	errObj := ErrorObject{
 		Code:    400,
 		Message: "Bad Request",
 	}
 
+	isPgErr := reflect.TypeOf(err).String() == "pgdriver.Error"
+
 	if err != nil {
-		pgErr := err.(pgdriver.Error)
+		if isPgErr {
+			pgErr := err.(pgdriver.Error)
 
-		if pgErr.IntegrityViolation() {
-			log.Printf("pgErr integrity violation: %s", pgErr.Field('n'))
+			if pgErr.IntegrityViolation() {
+				log.Printf("pgErr integrity violation: %s", pgErr.Field('n'))
 
-			switch pgErr.Field('n') {
-			case "username_unique_idx":
-				errObj = ErrorObject{
-					Code:    http.StatusBadRequest,
-					Message: "Username already taken",
-				}
+				switch pgErr.Field('n') {
+				case "username_unique_idx":
+					errObj = ErrorObject{
+						Code:    http.StatusBadRequest,
+						Message: "Username already taken",
+					}
 
-			case "username_alphanumeric_check":
-				errObj = ErrorObject{
-					Code:    http.StatusBadRequest,
-					Message: "Username must be aplhanumeric",
+				case "username_alphanumeric_check":
+					errObj = ErrorObject{
+						Code:    http.StatusBadRequest,
+						Message: "Username must be aplhanumeric",
+					}
 				}
 			}
 		}

@@ -15,6 +15,8 @@ func main() {
 	r := routers.NewRoutes()
 	cfg := utils.InitConfig()
 
+	log.SetFlags(log.Llongfile | log.LstdFlags)
+
 	rootFile := cfg.Frontend.Source
 	_, err := os.Stat(rootFile + "/index.html")
 

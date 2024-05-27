@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"gochi_api/models"
 	"log"
 	"net/http"
@@ -22,6 +23,7 @@ func (u Users) InitUsers(m models.MuxServer) {
 
 			r.Route("/{uuid}", func(r chi.Router) {
 				r.Get("/detail", u.GetUser)
+				r.Put("/update", u.UpdateUser)
 			})
 		})
 	})
@@ -56,4 +58,16 @@ func (u Users) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u.toJson(w, result)
+}
+
+func (u Users) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	user := u.userModel.NewRegister()
+
+	if err := json.NewDecoder(r.Body).Decode(&user); err == nil {
+		if _, err := u.userModel.UpdateUser(w, user, u.handleError); err != nil {
+			return
+		}
+
+		u.toJson(w, user)
+	}
 }

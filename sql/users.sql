@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   uuid char(36),
   status char(1) default 'O',
   active boolean default null,
+  last_login timestamptz null,
   created_at timestamptz default now(),
   updated_at timestamptz default now(),
   deleted_at timestamptz null,

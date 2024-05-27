@@ -101,7 +101,7 @@ func InitDBConnect() *bun.DB {
 
 	dsn := "postgres://" + username + ":" + password + "@" + host + ":" + port + "/" + database + "?sslmode=" + sslmode
 	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
-	db := bun.NewDB(sqldb, pgdialect.New())
+	db := bun.NewDB(sqldb, pgdialect.New(), bun.WithDiscardUnknownColumns())
 
 	if cfg.Env == "dev" {
 		db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))

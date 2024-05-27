@@ -3,9 +3,14 @@
 boilerplate api built on `go-chi`
 
 ## run api
-````sh
+```sh
 go run .
-````
+```
+
+## run test
+```sh
+go test .
+```
 
 [![GoDoc Widget]][GoDoc]
 [![GitHub Widget]][My GitHub]
