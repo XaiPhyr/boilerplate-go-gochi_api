@@ -6,8 +6,10 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	s "gochi_api/services"
+	utils "gochi_api/utils"
 
 	"github.com/go-chi/chi"
 )
@@ -23,6 +25,10 @@ func (a Authentication) InitAuthentication(m models.MuxServer) {
 
 	m.Mux.Route(m.Endpoint+"/register", func(r chi.Router) {
 		r.Post("/", a.Register)
+	})
+
+	m.Mux.Route(m.Endpoint+"/notify", func(r chi.Router) {
+		r.Get("/", a.Notify)
 	})
 }
 
@@ -47,7 +53,7 @@ func (a Authentication) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err = a.userModel.ReadByUsername(l.Username)
+	user, err = a.userModel.ReadByUsernameOrEmail(l.Username)
 
 	if err != nil {
 		a.handleError(w, http.StatusNotFound, "User not found")
@@ -59,10 +65,16 @@ func (a Authentication) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user.LastLogin = time.Now()
+	if _, err := a.userModel.UpdateUser(w, user, a.handleError); err != nil {
+		return
+	}
+
 	info.Token = token
 	info.Username = l.Username
 	info.RememberMe = l.RememberMe
 
+	utils.ListenNotify()
 	a.toJson(w, info)
 }
 
@@ -79,4 +91,8 @@ func (a Authentication) Register(w http.ResponseWriter, r *http.Request) {
 
 		a.toJson(w, user)
 	}
+}
+
+func (a Authentication) Notify(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("NOTIFIED"))
 }

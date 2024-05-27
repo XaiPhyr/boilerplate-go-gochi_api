@@ -29,6 +29,7 @@ type (
 		UUID      string    `bun:"uuid" json:"uuid"`
 		Status    string    `bun:"status,default:O" json:"status"`
 		Active    bool      `bun:"active" json:"active"`
+		LastLogin time.Time `bun:"last_login" json:"last_login"`
 		CreatedAt time.Time `bun:"created_at,default:current_timestamp" json:"created_at"`
 		UpdatedAt time.Time `bun:"updated_at,default:current_timestamp" json:"updated_at"`
 		DeletedAt time.Time `bun:"deleted_at,soft_delete,nullzero" json:"deleted_at"`
@@ -107,11 +108,12 @@ func (u *Users) DeleteOneUser(data *Users) (err error) {
 	return
 }
 
-func (u *Users) ReadByUsername(user string) (data *Users, err error) {
+func (u *Users) ReadByUsernameOrEmail(user string) (data *Users, err error) {
 	data = new(Users)
 
 	q, ctx := Read(data)
 	q = q.Where("username = ?", user)
+	q = q.WhereOr("email = ?", user)
 
 	err = q.Scan(ctx)
 

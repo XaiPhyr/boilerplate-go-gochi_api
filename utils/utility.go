@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"fmt"
 	"html/template"
@@ -108,4 +109,17 @@ func InitDBConnect() *bun.DB {
 	}
 
 	return db
+}
+
+func ListenNotify() {
+	db := InitDBConnect()
+	ctx := context.Background()
+
+	ln := pgdriver.NewListener(db)
+
+	go func() {
+		if err := ln.Listen(ctx, "last_login"); err != nil {
+			panic(err)
+		}
+	}()
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 
 	c "gochi_api/controllers"
@@ -41,14 +42,30 @@ func InitAuthenticationTest(req *http.Request) *httptest.ResponseRecorder {
 
 func TestAuthenticationLogin(t *testing.T) {
 	jsonBody := map[string]interface{}{
-		"username": "rdev2",
-		"password": "iamuser01",
+		"username": "rdev",
+		"password": "iamsuperadmin",
 	}
 
 	b, _ := json.Marshal(jsonBody)
 
 	req, _ := http.NewRequest("GET", APIURL, nil)
 	req.Header.Set("Authentication", string(b))
+	rr := InitAuthenticationTest(req)
+
+	require.Equal(t, http.StatusOK, rr.Code)
+}
+
+func TestAuthenticationRegister(t *testing.T) {
+	jsonBody := map[string]interface{}{
+		"email":     "rdev@local",
+		"username":  "rdev",
+		"password":  "iamsuperadmin",
+		"user_type": "superadmin",
+	}
+
+	b, _ := json.Marshal(jsonBody)
+
+	req, _ := http.NewRequest("POST", "/api/register", strings.NewReader(string(b)))
 	rr := InitAuthenticationTest(req)
 
 	require.Equal(t, http.StatusOK, rr.Code)
