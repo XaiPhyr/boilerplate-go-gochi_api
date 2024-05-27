@@ -15,3 +15,9 @@ database:
 
 frontend:
   src: ''
+
+smtp:
+  host: ''
+  port: ''
+  user: ''
+  pass: ''

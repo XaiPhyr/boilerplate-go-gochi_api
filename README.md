@@ -9,7 +9,7 @@ go run .
 
 ## run test
 ```sh
-go test .
+go test ./tests
 ```
 
 [![GoDoc Widget]][GoDoc]
