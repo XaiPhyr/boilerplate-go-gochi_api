@@ -1,4 +1,4 @@
-#
+# Golang Restful API Boilerplate (go-chi)
 
 Boilerplate api built using `go-chi`.
 
@@ -17,12 +17,12 @@ Table of contents
 # Installation
 
 ### Packages
-- [go-chi](https://github.com/go-chi/chi) - router
-- [bun](https://github.com/uptrace/bun) - Lightweight Golang ORM
-- [jwt](https://github.com/golang-jwt/jwt) - JWT Authentication
-- [yaml](https://gopkg.in/yaml.v3) - used for configuration files
-- [gomail](https://gopkg.in/gomail.v2) - Golang SMTP mailer
-- [websocket](https://github.com/gorilla/websocket) - used for notifications and chat <span style="color: red">(*in progress*)</span>
+- [go-chi](https://github.com/go-chi/chi) - lighweight router for building Go HTTP services.
+- [bun](https://github.com/uptrace/bun) - Lightweight Golang ORM (using PostgreSQL).
+- [jwt](https://github.com/golang-jwt/jwt) - Go implementation of JSON Web Token Authentication.
+- [yaml](https://gopkg.in/yaml.v3) - enables to decode YAML files to used for configuration.
+- [gomail](https://gopkg.in/gomail.v2) - Golang SMTP mailer.
+- [websocket](https://github.com/gorilla/websocket) - used for notifications and chat <span style="color: red">(*in progress*)</span>.
 
 # Application
 
@@ -40,25 +40,33 @@ go test ./tests
 ```
 │   main.go                     #
 ├───conf                        # Configuration:
-│       config.template.yml     #
+│       config.template.yml     #   *remove .template to be able to use configuration*
+|                               #
 ├───controllers                 # Controllers:
 │       AppControllers.go       #
+|                               #
 ├───middlewares                 # Middlewares:
 │       AppMiddlewares.go       #
+|                               #
 ├───models                      # Models:
 │       AppModels.go            #
+|                               #
 ├───routers                     # Routers:
 │       router.go               #
+|                               #
 ├───services                    # Services:
 |       AppServices.go          #
+|                               #
 ├───sql                         # SQL:
+|                               #
 ├───template                    # Templates:
-│   │   404.html                #
-│   │   index.html              #
+│   │   404.html                #   this folder can be used to deploy compiled web application to avoid getting cors error
+│   │   index.html              #   the 404 page is for when directing to api url using browser
 │   ├───css                     #
 │   └───emails                  #
 │           welcome.html        #
 ├───tests                       # Tests:
+|                               #
 └───utils                       # Utilities:
         utility.go              #
 ```
