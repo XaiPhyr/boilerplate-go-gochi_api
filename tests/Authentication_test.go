@@ -2,6 +2,7 @@ package tests
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -33,11 +34,11 @@ func InitAuthenticationTest(req *http.Request) *httptest.ResponseRecorder {
 
 	a.InitAuthentication(mux)
 
-	rr := httptest.NewRecorder()
+	res := httptest.NewRecorder()
 
-	r.ServeHTTP(rr, req)
+	r.ServeHTTP(res, req)
 
-	return rr
+	return res
 }
 
 func TestAuthenticationLogin(t *testing.T) {
@@ -50,9 +51,11 @@ func TestAuthenticationLogin(t *testing.T) {
 
 	req, _ := http.NewRequest("GET", APIURL, nil)
 	req.Header.Set("Authentication", string(b))
-	rr := InitAuthenticationTest(req)
+	res := InitAuthenticationTest(req)
 
-	require.Equal(t, http.StatusOK, rr.Code)
+	fmt.Printf("\nRESPONSE: %s", res.Body)
+
+	require.Equal(t, http.StatusOK, res.Code)
 }
 
 func TestAuthenticationRegister(t *testing.T) {
@@ -66,14 +69,14 @@ func TestAuthenticationRegister(t *testing.T) {
 	b, _ := json.Marshal(jsonBody)
 
 	req, _ := http.NewRequest("POST", "/api/register", strings.NewReader(string(b)))
-	rr := InitAuthenticationTest(req)
+	res := InitAuthenticationTest(req)
 
-	require.Equal(t, http.StatusOK, rr.Code)
+	require.Equal(t, http.StatusOK, res.Code)
 }
 
 func TestPageNotFound(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/404", nil)
-	rr := InitAuthenticationTest(req)
+	res := InitAuthenticationTest(req)
 
-	require.Equal(t, 404, rr.Code)
+	require.Equal(t, 404, res.Code)
 }

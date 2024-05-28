@@ -24,6 +24,7 @@ func (u Users) InitUsers(m models.MuxServer) {
 			r.Route("/{uuid}", func(r chi.Router) {
 				r.Get("/detail", u.GetUser)
 				r.Put("/update", u.UpdateUser)
+				r.Delete("/delete", u.DeleteUser)
 			})
 		})
 	})
@@ -70,4 +71,16 @@ func (u Users) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 		u.toJson(w, user)
 	}
+}
+
+func (u Users) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+	_, err := u.userModel.DeleteUser(w, uuid, u.handleError)
+
+	if err != nil {
+		log.Printf("Error: %s", err)
+		return
+	}
+
+	u.toJson(w, nil)
 }

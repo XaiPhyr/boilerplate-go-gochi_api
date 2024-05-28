@@ -28,19 +28,19 @@ func InitUsersTest(req *http.Request) *httptest.ResponseRecorder {
 
 	a.InitUsers(mux)
 
-	rr := httptest.NewRecorder()
+	res := httptest.NewRecorder()
 
-	r.ServeHTTP(rr, req)
+	r.ServeHTTP(res, req)
 
-	return rr
+	return res
 }
 
 func TestGetAllUsers(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/users", nil)
 	req.Header.Set("Authorization", "Bearer 1")
-	rr := InitUsersTest(req)
+	res := InitUsersTest(req)
 
-	require.Equal(t, http.StatusOK, rr.Code)
+	require.Equal(t, http.StatusOK, res.Code)
 }
 
 func TestUpdateUser(t *testing.T) {
@@ -57,7 +57,18 @@ func TestUpdateUser(t *testing.T) {
 
 	req, _ := http.NewRequest("PUT", url, strings.NewReader(string(b)))
 	req.Header.Set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IiIsImV4cCI6MTcxNjc5MTM0NX0.czTEb3XKPKOlVXLftigu1wlpt0rYeM6Zb8VnPZKVSrY")
-	rr := InitUsersTest(req)
+	res := InitUsersTest(req)
 
-	require.Equal(t, http.StatusOK, rr.Code)
+	require.Equal(t, http.StatusOK, res.Code)
+}
+
+func TestDeleteUser(t *testing.T) {
+	uuid := "8378840f-a785-4685-8dcf-98ca5e8c7bff"
+	url := "/api/users/" + uuid + "/delete"
+
+	req, _ := http.NewRequest("DELETE", url, nil)
+	req.Header.Set("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IiIsImV4cCI6MTcxNjg5MjE1NH0.Fbs5DKfBGLGsPb-5jCypA-d27Lqz8MOquDTjQghiWyE")
+	res := InitUsersTest(req)
+
+	require.Equal(t, http.StatusOK, res.Code)
 }

@@ -100,11 +100,23 @@ func (u *Users) UpdateUser(w http.ResponseWriter, data *Users, fn func(w http.Re
 	return
 }
 
-func (u *Users) DeleteAllUsers(data *Users) (err error) {
+func (u *Users) DeleteAllUsers(w http.ResponseWriter, fn func(w http.ResponseWriter, code int, message string)) (result sql.Result, err error) {
 	return
 }
 
-func (u *Users) DeleteOneUser(data *Users) (err error) {
+func (u *Users) DeleteUser(w http.ResponseWriter, uuid string, fn func(w http.ResponseWriter, code int, message string)) (result sql.Result, err error) {
+	data := new(Users)
+
+	q, ctx := Delete(data)
+	q = q.Where("uuid = ?", uuid)
+
+	result, err = q.Exec(ctx)
+
+	if err != nil {
+		u.HandleUserError(w, err, fn)
+		return nil, err
+	}
+
 	return
 }
 
