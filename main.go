@@ -17,11 +17,11 @@ func main() {
 
 	log.SetFlags(log.Llongfile | log.LstdFlags)
 
-	rootFile := cfg.Frontend.Source
-	_, err := os.Stat(rootFile + "/index.html")
+	src := cfg.Frontend.Source
+	_, err := os.Stat(src + "/index.html")
 
 	if !os.IsNotExist(err) {
-		FileServer(r, rootFile)
+		FileServer(r, src)
 	}
 
 	fmt.Println()
@@ -32,12 +32,12 @@ func main() {
 	http.ListenAndServe(":8200", r)
 }
 
-func FileServer(r chi.Router, root string) {
-	fs := http.FileServer(http.Dir(root))
+func FileServer(r chi.Router, src string) {
+	fs := http.FileServer(http.Dir(src))
 	r.Handle("/", http.StripPrefix("/", fs))
 
 	r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
-		if _, err := os.Stat(root + r.RequestURI); os.IsNotExist(err) {
+		if _, err := os.Stat(src + r.RequestURI); os.IsNotExist(err) {
 			http.StripPrefix(r.RequestURI, fs).ServeHTTP(w, r)
 			return
 		}

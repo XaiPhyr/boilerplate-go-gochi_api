@@ -9,6 +9,7 @@ import (
 
 	mw "gochi_api/middlewares"
 	utils "gochi_api/utils"
+	ws "gochi_api/websocket"
 
 	"github.com/go-chi/chi"
 )
@@ -16,6 +17,8 @@ import (
 var (
 	auth = &c.Authentication{}
 	user = &c.Users{}
+
+	websocket = &ws.Websocket{}
 )
 
 func NewRoutes() chi.Router {
@@ -32,6 +35,8 @@ func NewRoutes() chi.Router {
 	// @routes
 	auth.InitAuthentication(mux)
 	user.InitUsers(mux)
+
+	websocket.InitWebsocket(mux)
 
 	// @status 404, 405
 	PageNotFound(r)

@@ -36,7 +36,7 @@
   </style>
   <script>
     async function onWebSocket(data) {
-      const socket = new WebSocket('ws://localhost:8200/api/notify');
+      const socket = new WebSocket('ws://localhost:8200/ws');
 
       socket.onopen = () => {
         socket.send(data);
@@ -81,11 +81,21 @@
       <form action="">
         <div class="row">
           <label for="">Username</label>
-          <input type="text" name="name_username" id="id_username" />
+          <input
+            type="text"
+            name="name_username"
+            id="id_username"
+            value="rdev"
+          />
         </div>
         <div class="row">
           <label for="">Password</label>
-          <input type="password" name="name_password" id="id_password" />
+          <input
+            type="password"
+            name="name_password"
+            id="id_password"
+            value="iamsuperadmin"
+          />
         </div>
         <div class="row">
           <input type="button" value="Submit" onclick="onLogin()" />
