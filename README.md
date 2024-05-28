@@ -40,7 +40,7 @@ go test ./tests
 ```
 │   main.go                     #
 ├───conf                        # Configuration:
-│       config.template.yml     #   *remove .template to be able to use configuration*
+│       config.template.yml     #   *remove .template leaving only config.yml to be able to use configuration*
 |                               #
 ├───controllers                 # Controllers:
 │       AppControllers.go       #

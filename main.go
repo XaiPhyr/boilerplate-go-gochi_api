@@ -21,10 +21,7 @@ func main() {
 	_, err := os.Stat(rootFile + "/index.html")
 
 	if !os.IsNotExist(err) {
-		fs := http.FileServer(http.Dir(rootFile))
-		r.Handle("/", http.StripPrefix("/", fs))
-
-		FileServer(r, fs, rootFile)
+		FileServer(r, rootFile)
 	}
 
 	fmt.Println()
@@ -35,8 +32,11 @@ func main() {
 	http.ListenAndServe(":8200", r)
 }
 
-func FileServer(router chi.Router, fs http.Handler, root string) {
-	router.Get("/*", func(w http.ResponseWriter, r *http.Request) {
+func FileServer(r chi.Router, root string) {
+	fs := http.FileServer(http.Dir(root))
+	r.Handle("/", http.StripPrefix("/", fs))
+
+	r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
 		if _, err := os.Stat(root + r.RequestURI); os.IsNotExist(err) {
 			http.StripPrefix(r.RequestURI, fs).ServeHTTP(w, r)
 			return
