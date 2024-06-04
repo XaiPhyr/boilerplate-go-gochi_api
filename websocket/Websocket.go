@@ -42,11 +42,6 @@ var (
 	space   = []byte{' '}
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
-
 func (w Websocket) InitWebsocket(m models.MuxServer) {
 
 	hub := newHub()
@@ -75,15 +70,18 @@ func (h *Hub) run() {
 		select {
 		case client := <-h.register:
 			h.clients[client] = true
+
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
 			}
+
 		case message := <-h.send:
 			for client := range h.clients {
 				select {
 				case client.send <- message:
+
 				default:
 					close(client.send)
 					delete(h.clients, client)
@@ -159,6 +157,11 @@ func (c *Client) writePump() {
 }
 
 func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+	upgrader := websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
+
 	conn, err := upgrader.Upgrade(w, r, nil)
 
 	if err != nil {

@@ -29,7 +29,7 @@ func main() {
 	log.Printf("-> Version: %s", cfg.Env)
 	fmt.Println()
 
-	http.ListenAndServe(":8200", r)
+	log.Printf("%s", http.ListenAndServe(":8200", r))
 }
 
 func FileServer(r chi.Router, src string) {
